@@ -5,10 +5,7 @@ function objectParse(obj, type) {
     if (obj == null) {
     }
     else if (Array.isArray(obj)) {
-        res = [];
-        obj.forEach((val, i) => {
-            res[i] = val;
-        });
+        throw new Error('Object is an array');
     }
     else if (typeof obj == 'object') {
         res = new type();

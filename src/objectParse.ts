@@ -1,14 +1,11 @@
 import IEntityType from './IEntityType';
 
-function objectParse<T>(obj: any, type: IEntityType<T>): T {
-	let res = null;
+function objectParse<T extends Object>(obj: any, type: IEntityType<T>): T {
+	let res: T = null;
 
 	if (obj == null) {
 	} else if (Array.isArray(obj)) {
-		res = [];
-		obj.forEach((val, i) => {
-			res[i] = val;
-		});
+		throw new Error('Object is an array');
 	} else if (typeof obj == 'object') {
 		res = new type();
 		let keys = Reflect.ownKeys(res);
@@ -24,7 +21,6 @@ function objectParse<T>(obj: any, type: IEntityType<T>): T {
 	} else {
 		res = new type(obj);
 	}
-
 	return res;
 }
 
