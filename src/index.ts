@@ -1,7 +1,13 @@
-import IEntityType from './IEntityType';
-import objectParse from './objectParse';
-import asyncBatch from './asyncBatch';
+import map from './arrayUtil/map.js';
+import filter from './arrayUtil/filter.js';
+import toPaths from './objectUtil/toPaths.js';
+import IEntityType from './objectUtil/IEntityType.js';
+import parseStrict from './objectUtil/parseStrict.js';
 
+// Object Functions
 export { IEntityType };
-export { objectParse };
-export { asyncBatch };
+export { parseStrict };
+export { toPaths };
+// Array Functions
+export { map };
+export { filter };

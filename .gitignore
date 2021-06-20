@@ -2,11 +2,13 @@
 logs
 *.log
 
-
 # Dependency directories
 node_modules/
 
 # Yarn Integrity file
 yarn.lock
+
+# TypeScript cache
+tsconfig.tsbuildinfo
 
 .DS_Store
