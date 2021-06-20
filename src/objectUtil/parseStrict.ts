@@ -1,4 +1,5 @@
 import IEntityType from './IEntityType';
+import ValidationError from './ValidationError.js';
 
 function parseStrict<T>(src: any, res: T, prefix?: string): T {
 	if (res == null) {
@@ -31,7 +32,7 @@ function parseStrict<T>(src: any, res: T, prefix?: string): T {
 						(<any>res) = src;
 					}
 				} else {
-					throw new Error(`Invalid Type for key: ${prefix}`);
+					throw new ValidationError(`Invalid Type for key: ${prefix}`);
 				}
 			} else {
 				Object.entries(res).forEach(([key, val]) => {
@@ -46,7 +47,7 @@ function parseStrict<T>(src: any, res: T, prefix?: string): T {
 			res = new type(src);
 		}
 	} else {
-		throw new Error(`Invalid Type for key: ${prefix}`);
+		throw new ValidationError(`Invalid Type for key: ${prefix}`);
 	}
 	return res;
 }
