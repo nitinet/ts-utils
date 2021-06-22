@@ -1,9 +1,10 @@
-import map from './arrayUtil/map.js';
-import filter from './arrayUtil/filter.js';
-import toPaths from './objectUtil/toPaths.js';
-import IEntityType from './objectUtil/IEntityType.js';
-import parseStrict from './objectUtil/parseStrict.js';
-import ValidationError from './objectUtil/ValidationError.js';
+import filter from './array/filter.js';
+import map from './array/map.js';
+import TreeMap from './map/TreeMap.js';
+import IEntityType from './object/IEntityType.js';
+import parseStrict from './object/parseStrict.js';
+import toPaths from './object/toPaths.js';
+import ValidationError from './object/ValidationError.js';
 
 // Object Functions
 export { IEntityType };
@@ -13,3 +14,6 @@ export { ValidationError };
 // Array Functions
 export { map };
 export { filter };
+// Map Utils
+export { TreeMap };
+

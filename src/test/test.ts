@@ -1,4 +1,4 @@
-import parseStrict from '../objectUtil/parseStrict.js';
+import parseStrict from '../object/parseStrict.js';
 
 class Person {
 	empName = 'test';

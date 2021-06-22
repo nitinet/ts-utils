@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const parseStrict_js_1 = require("../objectUtil/parseStrict.js");
+const parseStrict_js_1 = require("../object/parseStrict.js");
 class Person {
     constructor() {
         this.empName = 'test';
