@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const parseStrict_js_1 = require("../object/parseStrict.js");
+import parseStrict from '../object/parseStrict.js';
 class Person {
     constructor() {
         this.empName = 'test';
@@ -27,6 +25,6 @@ var test = {
         { empName: 'empName3,' }
     ]
 };
-var res = parseStrict_js_1.default(test, new Company());
+var res = parseStrict(test, new Company());
 console.log(res);
 //# sourceMappingURL=test.js.map
