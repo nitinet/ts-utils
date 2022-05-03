@@ -1,5 +1,9 @@
+const MAX_LIMIT = 1000000;
 class ObjectPool {
     constructor(entityType, poolSize) {
+        this.poolSize = 0;
+        this.lowerLimitCount = 0;
+        this.idx = 0;
         this.pool = new Array();
         this.entityType = entityType;
         this.setPoolSize(poolSize);
@@ -10,29 +14,54 @@ class ObjectPool {
     }
     setPoolSize(poolSize) {
         this.poolSize = poolSize ?? 100;
+        this.lowerLimitCount = Math.round(this.poolSize * 0.2);
     }
     getPoolCount() {
-        return this.pool.length;
+        return this.poolSize - this.idx;
     }
     fillPool() {
-        for (let i = 0; i < this.poolSize; i++) {
-            this.pool.push(new this.entityType());
+        let count = this.poolSize - this.pool.length;
+        let temp = new Array(count).fill(null);
+        for (let i = 0; i < count; i++) {
+            temp[i] = new this.entityType();
         }
+        this.pool.splice(0, 0, ...temp);
+        this.setPoolSize(this.pool.length);
     }
     alloc() {
-        if (this.pool.length == 0) {
+        let res = this.pool[this.idx];
+        this.pool[this.idx] = null;
+        this.idx++;
+        if (this.idx == this.poolSize) {
+            if (this.poolSize > MAX_LIMIT) {
+                this.poolSize = Math.round(this.poolSize / 2);
+                this.pool.splice(this.poolSize);
+                this.setPoolSize(this.pool.length);
+            }
             this.poolSize = Math.round(this.poolSize * 1.25);
             this.fillPool();
         }
-        let res = this.pool.pop();
         return res;
     }
     free(obj) {
         obj.reset();
-        this.pool.push(obj);
-        if (this.pool.length > this.poolSize) {
-            this.poolSize = Math.round(this.poolSize * 0.80);
-            this.pool.splice(this.poolSize * 0.80);
+        this.idx--;
+        this.pool[this.idx] = obj;
+        if (this.idx < this.lowerLimitCount) {
+            if (this.idx == 0) {
+                this.poolSize = 100;
+                this.fillPool();
+                let halfSize = this.poolSize / 2;
+                while (this.idx < halfSize) {
+                    this.pool[this.idx] = null;
+                    this.idx++;
+                }
+            }
+            else {
+                let temp = Math.round(this.poolSize / 2);
+                this.pool.splice(temp);
+                this.setPoolSize(this.pool.length);
+            }
         }
     }
 }
