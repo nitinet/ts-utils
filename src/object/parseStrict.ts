@@ -1,4 +1,4 @@
-import IEntityType from './IEntityType';
+import IEntityType from './IEntityType.js';
 import ValidationError from './ValidationError.js';
 
 function parseStrict<T>(src: any, res: T, prefix?: string): T {

@@ -1,8 +1,4 @@
-async function map<T, R>(
-	arr: T[],
-	handler: (ele: T, index: number) => Promise<R>,
-	count?: number,
-): Promise<R[]> {
+async function map<T, R>(arr: T[], handler: (ele: T, index: number) => Promise<R>, count?: number): Promise<R[]> {
 	// Cap workers count to task list size, with a min of 1 worker
 	count = count || arr.length;
 	const workersCount = Math.max(Math.floor(Math.min(count, arr.length)), 0);

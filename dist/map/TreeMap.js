@@ -1,5 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+var _a;
 class Node {
     constructor(key, value) {
         this.key = null;
@@ -37,13 +36,12 @@ class MapIterator {
 }
 class TreeMap {
     constructor(option) {
-        var _a;
         this.root = null;
         this.compare = null;
         this.size = 0;
-        this[Symbol.toStringTag] = 'TreeMap';
+        this[_a] = 'TreeMap';
         option = option || {};
-        this.compare = (_a = option.compare) !== null && _a !== void 0 ? _a : function (key1, key2) {
+        this.compare = option.compare ?? function (key1, key2) {
             let res = 0;
             if (key1 < key2)
                 res = -1;
@@ -297,5 +295,6 @@ class TreeMap {
         return arr;
     }
 }
-exports.default = TreeMap;
+_a = Symbol.toStringTag;
+export default TreeMap;
 //# sourceMappingURL=TreeMap.js.map
