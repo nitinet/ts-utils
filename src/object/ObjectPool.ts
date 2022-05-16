@@ -1,8 +1,6 @@
 import IResetEntity from './IResetEntity.js';
 import IEntityType from './IEntityType.js';
 
-const MAX_LIMIT = 1000000;
-
 class ObjectPool<T extends IResetEntity>{
 	private entityType: IEntityType<T>;
 	poolSize: number = 0;
@@ -21,9 +19,9 @@ class ObjectPool<T extends IResetEntity>{
 		return this.poolSize;
 	}
 
-	setPoolSize(poolSize: number) {
-		this.poolSize = poolSize ?? 100;
-		this.lowerLimitCount = Math.round(this.poolSize * 0.2);
+	setPoolSize(poolSize?: number) {
+		this.poolSize = poolSize ?? 64;
+		this.lowerLimitCount = Math.round(this.poolSize / 8);
 	}
 
 	getPoolCount() {
@@ -45,16 +43,10 @@ class ObjectPool<T extends IResetEntity>{
 		this.pool[this.idx] = null;
 		this.idx++;
 
-		if (this.idx == this.poolSize) {
-			if (this.poolSize > MAX_LIMIT) {
-				this.poolSize = Math.round(this.poolSize / 2);
-				this.pool.splice(this.poolSize);
-				this.setPoolSize(this.pool.length);
-			}
-			this.poolSize = Math.round(this.poolSize * 1.25);
+		if (this.idx >= this.poolSize) {
+			this.poolSize = Math.round(this.poolSize * 2);
 			this.fillPool();
 		}
-
 		return res;
 	}
 
@@ -63,9 +55,9 @@ class ObjectPool<T extends IResetEntity>{
 		this.idx--;
 		this.pool[this.idx] = obj;
 
-		if (this.idx < this.lowerLimitCount) {
-			if (this.idx == 0) {
-				this.poolSize = 100;
+		if (this.idx <= this.lowerLimitCount) {
+			if (this.idx <= 0) {
+				this.poolSize = 64;
 				this.fillPool();
 				let halfSize = this.poolSize / 2;
 				while (this.idx < halfSize) {
