@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class ValidationError extends Error {
     constructor(mesg, status, err) {
         super(mesg);
@@ -7,5 +9,5 @@ class ValidationError extends Error {
         this.err = err;
     }
 }
-export default ValidationError;
+exports.default = ValidationError;
 //# sourceMappingURL=ValidationError.js.map

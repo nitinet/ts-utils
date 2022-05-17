@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function toPaths(obj, target, prefix) {
     target = target || [];
     prefix = prefix || '';
@@ -19,5 +21,5 @@ function toPaths(obj, target, prefix) {
     });
     return target;
 }
-export default toPaths;
+exports.default = toPaths;
 //# sourceMappingURL=toPaths.js.map
