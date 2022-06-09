@@ -1,6 +1,4 @@
-"use strict";
 var _a;
-Object.defineProperty(exports, "__esModule", { value: true });
 class Node {
     constructor(key, value) {
         this.key = null;
@@ -298,5 +296,5 @@ class TreeMap {
     }
 }
 _a = Symbol.toStringTag;
-exports.default = TreeMap;
+export default TreeMap;
 //# sourceMappingURL=TreeMap.js.map

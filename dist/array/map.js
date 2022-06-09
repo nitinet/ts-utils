@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 async function map(arr, handler, count) {
     count = count || arr.length;
     const workersCount = Math.max(Math.floor(Math.min(count, arr.length)), 0);
@@ -11,5 +9,5 @@ async function map(arr, handler, count) {
     }));
     return results;
 }
-exports.default = map;
+export default map;
 //# sourceMappingURL=map.js.map

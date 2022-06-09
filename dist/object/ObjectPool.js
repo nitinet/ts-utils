@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 class ObjectPool {
     constructor(entityType, poolSize) {
         this.poolSize = 0;
@@ -61,5 +59,5 @@ class ObjectPool {
         }
     }
 }
-exports.default = ObjectPool;
+export default ObjectPool;
 //# sourceMappingURL=ObjectPool.js.map

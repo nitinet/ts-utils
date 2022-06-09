@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 class AdvArray {
     toString() {
         throw new Error("Method not implemented.");
@@ -104,5 +102,5 @@ class AdvArray {
         throw new Error("Method not implemented.");
     }
 }
-exports.default = AdvArray;
+export default AdvArray;
 //# sourceMappingURL=AdvArray.js.map

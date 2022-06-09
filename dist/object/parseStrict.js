@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const ValidationError_js_1 = require("./ValidationError.js");
+import ValidationError from './ValidationError.js';
 function parseStrict(src, res, prefix) {
     if (res == null) {
         res = src;
@@ -34,7 +32,7 @@ function parseStrict(src, res, prefix) {
                     }
                 }
                 else {
-                    throw new ValidationError_js_1.default(`Invalid Type for key: ${prefix}`);
+                    throw new ValidationError(`Invalid Type for key: ${prefix}`);
                 }
             }
             else {
@@ -53,7 +51,7 @@ function parseStrict(src, res, prefix) {
         }
     }
     else {
-        throw new ValidationError_js_1.default(`Invalid Type for key: ${prefix}`);
+        throw new ValidationError(`Invalid Type for key: ${prefix}`);
     }
     return res;
 }
@@ -99,5 +97,5 @@ function getPrimitiveClone(val) {
     else
         return null;
 }
-exports.default = parseStrict;
+export default parseStrict;
 //# sourceMappingURL=parseStrict.js.map
