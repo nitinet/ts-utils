@@ -240,15 +240,16 @@ class TreeMap<K, V> implements Map<K, V>{
 		this.root = null;
 	}
 
-	forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
-		function runForEach(node: Node<K, V>, callbackfunc: (value: V, key: K, map: Map<K, V>) => void) {
-			if (node != null) {
-				runForEach(node.left, callbackfunc);
-				callbackfunc(node.value, node.key, thisArg);
-				runForEach(node.right, callbackfunc);
-			}
+	private runForEach(node: Node<K, V>, callbackfunc: (value: V, key: K, map: Map<K, V>) => void) {
+		if (node != null) {
+			this.runForEach(node.left, callbackfunc);
+			callbackfunc(node.value, node.key, this);
+			this.runForEach(node.right, callbackfunc);
 		}
-		runForEach(this.root, callbackfn);
+	}
+
+	forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void) {
+		this.runForEach(this.root, callbackfn);
 	}
 
 	get(key: K): V {

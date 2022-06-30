@@ -1,18 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ValidationError = exports.toPaths = exports.parseStrict = exports.ObjectPool = exports.TreeMap = exports.filter = exports.map = void 0;
-const filter_js_1 = require("./array/filter.js");
-exports.filter = filter_js_1.default;
-const map_js_1 = require("./array/map.js");
-exports.map = map_js_1.default;
-const TreeMap_js_1 = require("./map/TreeMap.js");
-exports.TreeMap = TreeMap_js_1.default;
-const ObjectPool_js_1 = require("./object/ObjectPool.js");
-exports.ObjectPool = ObjectPool_js_1.default;
-const parseStrict_js_1 = require("./object/parseStrict.js");
-exports.parseStrict = parseStrict_js_1.default;
-const toPaths_js_1 = require("./object/toPaths.js");
-exports.toPaths = toPaths_js_1.default;
-const ValidationError_js_1 = require("./object/ValidationError.js");
-exports.ValidationError = ValidationError_js_1.default;
+exports.object = exports.map = exports.array = void 0;
+const index_js_1 = require("./array/index.js");
+exports.array = index_js_1.default;
+const index_js_2 = require("./map/index.js");
+exports.map = index_js_2.default;
+const index_js_3 = require("./object/index.js");
+exports.object = index_js_3.default;
+exports.default = {
+    array: index_js_1.default,
+    map: index_js_2.default,
+    object: index_js_3.default
+};
 //# sourceMappingURL=index.js.map

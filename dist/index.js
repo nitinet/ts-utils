@@ -1,15 +1,10 @@
-import filter from './array/filter.js';
-import map from './array/map.js';
-import TreeMap from './map/TreeMap.js';
-import ObjectPool from './object/ObjectPool.js';
-import parseStrict from './object/parseStrict.js';
-import toPaths from './object/toPaths.js';
-import ValidationError from './object/ValidationError.js';
-export { map };
-export { filter };
-export { TreeMap };
-export { ObjectPool };
-export { parseStrict };
-export { toPaths };
-export { ValidationError };
+import array from './array/index.js';
+import map from './map/index.js';
+import object from './object/index.js';
+export default {
+    array,
+    map,
+    object
+};
+export { array, map, object };
 //# sourceMappingURL=index.js.map

@@ -161,15 +161,15 @@ class TreeMap {
     clear() {
         this.root = null;
     }
-    forEach(callbackfn, thisArg) {
-        function runForEach(node, callbackfunc) {
-            if (node != null) {
-                runForEach(node.left, callbackfunc);
-                callbackfunc(node.value, node.key, thisArg);
-                runForEach(node.right, callbackfunc);
-            }
+    runForEach(node, callbackfunc) {
+        if (node != null) {
+            this.runForEach(node.left, callbackfunc);
+            callbackfunc(node.value, node.key, this);
+            this.runForEach(node.right, callbackfunc);
         }
-        runForEach(this.root, callbackfn);
+    }
+    forEach(callbackfn) {
+        this.runForEach(this.root, callbackfn);
     }
     get(key) {
         let node = this.root;
