@@ -10,7 +10,7 @@ class Node {
         this.value = value;
     }
 }
-class MapIterator {
+class TreeMapIterator {
     constructor(root, valueFunc) {
         this.stack = [];
         this.stack.push(root);
@@ -202,19 +202,19 @@ class TreeMap {
         return node != null;
     }
     entries() {
-        let iterator = new MapIterator(this.root, (node) => {
+        let iterator = new TreeMapIterator(this.root, (node) => {
             return [node.key, node.value];
         });
         return iterator;
     }
     keys() {
-        let iterator = new MapIterator(this.root, (node) => {
+        let iterator = new TreeMapIterator(this.root, (node) => {
             return node.key;
         });
         return iterator;
     }
     values() {
-        let iterator = new MapIterator(this.root, (node) => {
+        let iterator = new TreeMapIterator(this.root, (node) => {
             return node.value;
         });
         return iterator;

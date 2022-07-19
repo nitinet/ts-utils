@@ -1,6 +1,8 @@
 import TreeMap from './TreeMap.js';
+import HashMap from './HashMap.js';
 export default {
-    TreeMap
+    TreeMap,
+    HashMap
 };
-export { TreeMap };
+export { TreeMap, HashMap };
 //# sourceMappingURL=index.js.map

@@ -1,34 +1,73 @@
 var _a;
 const InitialModulous = 16;
+class Node {
+    constructor(key, val) {
+        this.key = null;
+        this.val = null;
+        this.key = key;
+        this.val = val;
+    }
+}
 class HashMap {
     constructor() {
         this.valArr = new Array();
-        this.keyArr = new Array();
         this.modulous = InitialModulous;
         this.count = 0;
         this[_a] = 'HashMap';
     }
     hashFunc(key) {
-        return 0;
+        let res = 0;
+        let temp = null;
+        switch (typeof key) {
+            case 'boolean': {
+                res = key ? 1 : 0;
+                break;
+            }
+            case 'number': {
+                res = key;
+                break;
+            }
+            case 'function':
+            case 'bigint':
+            case 'symbol':
+            case 'string': {
+                temp = key.toString();
+                break;
+            }
+            case 'object': {
+                temp = JSON.stringify(key);
+                break;
+            }
+        }
+        if (temp)
+            res = this.strHashCode(temp);
+        return res;
+    }
+    strHashCode(str) {
+        let hash = 0;
+        if (str.length == 0)
+            return hash;
+        for (let i = 0; i < str.length; i++) {
+            let char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash;
     }
     indexCode(hashNum) {
         return hashNum % this.modulous;
     }
     expand() {
-        this.keyArr.splice(0, 0, ...(new Array(this.modulous)));
         this.valArr.splice(0, 0, ...(new Array(this.modulous)));
         this.modulous *= 2;
-        for (let i = 0; i < this.keyArr.length; i++) {
-            let key = this.keyArr[i];
-            if (key) {
-                let hashNum = this.hashFunc(key);
+        for (let i = 0; i < this.valArr.length; i++) {
+            let obj = this.valArr[i];
+            if (obj) {
+                let hashNum = this.hashFunc(obj.key);
                 let newIdx = this.indexCode(hashNum);
                 if (i != newIdx) {
-                    let val = this.valArr[i];
-                    this.keyArr[i] = null;
                     this.valArr[i] = null;
-                    this.keyArr[newIdx] = key;
-                    this.valArr[newIdx] = val;
+                    this.valArr[newIdx] = obj;
                 }
             }
         }
@@ -37,37 +76,31 @@ class HashMap {
         let compress = true;
         let halfMod = this.modulous / 2;
         for (let i = 0; i < halfMod; i++) {
-            if (this.keyArr[i] != null && this.keyArr[i + halfMod] != null) {
+            if (this.valArr[i] != null && this.valArr[i + halfMod] != null) {
                 compress = false;
                 break;
             }
         }
         if (compress) {
             this.modulous = halfMod;
-            for (let i = 0; i < this.keyArr.length; i++) {
-                let key = this.keyArr[i];
-                if (key) {
-                    let hashNum = this.hashFunc(key);
+            for (let i = 0; i < this.valArr.length; i++) {
+                let obj = this.valArr[i];
+                if (obj) {
+                    let hashNum = this.hashFunc(obj.key);
                     let newIdx = this.indexCode(hashNum);
                     if (i != newIdx) {
-                        let val = this.valArr[i];
-                        this.keyArr[i] = null;
                         this.valArr[i] = null;
-                        this.keyArr[newIdx] = key;
-                        this.valArr[newIdx] = val;
+                        this.valArr[newIdx] = obj;
                     }
                 }
             }
-            this.keyArr.splice(this.modulous, this.modulous);
             this.valArr.splice(this.modulous, this.modulous);
         }
     }
-    balance() { }
     get size() {
         return this.count;
     }
     clear() {
-        this.keyArr = new Array();
         this.valArr = new Array();
         this.modulous = InitialModulous;
         this.count = 0;
@@ -76,53 +109,83 @@ class HashMap {
         let idx = this.hashFunc(key);
         if (null == idx)
             return false;
-        this.keyArr[idx] = null;
         this.valArr[idx] = null;
         this.count--;
+        this.contract();
         return true;
     }
     forEach(callbackfn, thisArg) {
         if (!thisArg)
             thisArg = this;
-        thisArg.keyArr.forEach((key, idx) => {
-            if (key != null) {
-                callbackfn(thisArg.valArr[idx], key, thisArg);
+        thisArg.valArr.forEach((obj) => {
+            if (obj != null) {
+                callbackfn(obj.val, obj.key, thisArg);
             }
         });
     }
     get(key) {
-        let idx = this.hashFunc(key);
-        if (null == idx)
-            return null;
-        let val = this.valArr[idx];
-        return val;
+        let hashNum = this.hashFunc(key);
+        let idx = this.indexCode(hashNum);
+        let obj = this.valArr[idx];
+        return obj ? obj.val : null;
     }
     has(key) {
-        let idx = this.hashFunc(key);
-        return idx != null;
+        let hashNum = this.hashFunc(key);
+        let idx = this.indexCode(hashNum);
+        let obj = this.valArr[idx];
+        return obj ? true : false;
     }
     set(key, value) {
         let hashNum = this.hashFunc(key);
         let idx = this.indexCode(hashNum);
-        let prevKey = this.keyArr[idx];
-        if (prevKey == null || hashNum == this.hashFunc(prevKey)) {
-            this.keyArr[idx] = key;
-            this.valArr[idx] = value;
+        let prevObj = this.valArr[idx];
+        if (prevObj == null || hashNum == this.hashFunc(prevObj.key)) {
+            this.valArr[idx] = new Node(key, value);
         }
         else {
             this.expand();
             this.set(key, value);
         }
-        this.count++;
         return this;
     }
     entries() {
+        let valsItr = this.valArr.values();
+        return {
+            next() {
+                let itrVal = valsItr.next();
+                let obj = itrVal?.value;
+                return { value: [obj?.key, obj?.val], done: itrVal.done };
+            },
+            [Symbol.iterator]() {
+                return this;
+            }
+        };
     }
     keys() {
-        return this.keyArr.values();
+        let valsItr = this.valArr.values();
+        return {
+            next() {
+                let itrVal = valsItr.next();
+                let obj = itrVal?.value;
+                return { value: obj?.key, done: itrVal.done };
+            },
+            [Symbol.iterator]() {
+                return this;
+            }
+        };
     }
     values() {
-        return this.valArr.values();
+        let valsItr = this.valArr.values();
+        return {
+            next() {
+                let itrVal = valsItr.next();
+                let obj = itrVal?.value;
+                return { value: obj?.val, done: itrVal.done };
+            },
+            [Symbol.iterator]() {
+                return this;
+            }
+        };
     }
     [Symbol.iterator]() {
         return this.entries();
