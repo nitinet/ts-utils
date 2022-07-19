@@ -37,8 +37,8 @@ class MapIterator {
 class TreeMap {
     constructor(option) {
         this.root = null;
+        this.count = 0;
         this.compare = null;
-        this.size = 0;
         this[_a] = 'TreeMap';
         option = option || {};
         this.compare = option.compare ?? function (key1, key2) {
@@ -49,6 +49,9 @@ class TreeMap {
                 res = 1;
             return res;
         };
+    }
+    get size() {
+        return this.count;
     }
     height(node) {
         if (node == null)
@@ -80,7 +83,7 @@ class TreeMap {
     }
     insert(node, newNode) {
         if (node == null) {
-            this.size++;
+            this.count++;
             return newNode;
         }
         let comp = this.compare(newNode.key, node.key);
@@ -129,7 +132,7 @@ class TreeMap {
                     temp = node.left;
                 }
                 node = temp;
-                this.size--;
+                this.count--;
             }
             else {
                 let temp = this.minValueNode(node.right);

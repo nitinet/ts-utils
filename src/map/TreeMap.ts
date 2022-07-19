@@ -17,7 +17,7 @@ interface IOption<K> {
 	compare?: (key1: K, key2: K) => number;
 }
 
-class MapIterator<V> implements IterableIterator<V>{
+class TreeMapIterator<V> implements IterableIterator<V>{
 	stack: Node<any, any>[] = [];
 
 	valueFunc: (obj: Node<any, any>) => V;
@@ -49,10 +49,13 @@ class MapIterator<V> implements IterableIterator<V>{
 class TreeMap<K, V> implements Map<K, V>{
 
 	private root: Node<K, V> = null;
+	private count: number = 0;
 
 	private compare: (key1: K, key2: K) => number = null;
 
-	size = 0;
+	get size(): number {
+		return this.count;
+	}
 
 	constructor(option?: IOption<K>) {
 		option = option || {};
@@ -113,7 +116,7 @@ class TreeMap<K, V> implements Map<K, V>{
 	private insert(node: Node<K, V>, newNode: Node<K, V>) {
 		/* 1.  Perform the normal BST insertion */
 		if (node == null) {
-			this.size++;
+			this.count++;
 			return newNode;
 		}
 
@@ -189,7 +192,7 @@ class TreeMap<K, V> implements Map<K, V>{
 				}
 
 				node = temp;
-				this.size--;
+				this.count--;
 			} else {
 				// node with two children: Get the inorder successor (smallest in the right subtree) 
 				let temp: Node<K, V> = this.minValueNode(node.right);
@@ -282,21 +285,21 @@ class TreeMap<K, V> implements Map<K, V>{
 	}
 
 	entries(): IterableIterator<[K, V]> {
-		let iterator = new MapIterator<[K, V]>(this.root, (node) => {
+		let iterator = new TreeMapIterator<[K, V]>(this.root, (node) => {
 			return [node.key, node.value]
 		});
 		return iterator;
 	}
 
 	keys(): IterableIterator<K> {
-		let iterator = new MapIterator<K>(this.root, (node) => {
+		let iterator = new TreeMapIterator<K>(this.root, (node) => {
 			return node.key;
 		});
 		return iterator;
 	}
 
 	values(): IterableIterator<V> {
-		let iterator = new MapIterator<V>(this.root, (node) => {
+		let iterator = new TreeMapIterator<V>(this.root, (node) => {
 			return node.value;
 		});
 		return iterator;
