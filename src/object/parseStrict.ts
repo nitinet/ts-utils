@@ -1,5 +1,4 @@
 import IEntityType from './IEntityType.js';
-import ValidationError from './ValidationError.js';
 
 function parseStrict<T>(src: any, res: T, prefix?: string): T {
 	if (res == null) {
@@ -19,25 +18,25 @@ function parseStrict<T>(src: any, res: T, prefix?: string): T {
 						if (isPrimitive(res[0])) {
 							src.forEach((ele, idx) => {
 								let prefixKey = prefix ? `${prefix}[${idx}]` : `${idx}`;
-								res[idx] = parseStrict(ele, getPrimitiveClone(res[0]), prefixKey)
+								(<any[]>res)[idx] = parseStrict(ele, getPrimitiveClone((<any[]>res)[0]), prefixKey)
 							});
 						} else {
 							let subType: IEntityType<any> = res[0].constructor;
 							src.forEach((ele, idx) => {
 								let prefixKey = prefix ? `${prefix}[${idx}]` : `${idx}`;
-								res[idx] = parseStrict(ele, new subType(), prefixKey)
+								(<any[]>res)[idx] = parseStrict(ele, new subType(), prefixKey)
 							});
 						}
 					} else {
 						(<any>res) = src;
 					}
 				} else {
-					throw new ValidationError(`Invalid Type for key: ${prefix}`);
+					throw new Error(`Invalid Type for key: ${prefix}`);
 				}
 			} else {
 				Object.entries(res).forEach(([key, val]) => {
 					let prefixKey = prefix ? `${prefix}.${key}` : key;
-					res[key] = parseStrict(src[key], val, prefixKey);
+					Reflect.set(<Object>res, key, parseStrict(src[key], val, prefixKey));
 				});
 			}
 		} else if (isPrimitive(res)) {
@@ -47,12 +46,12 @@ function parseStrict<T>(src: any, res: T, prefix?: string): T {
 			res = new type(src);
 		}
 	} else {
-		throw new ValidationError(`Invalid Type for key: ${prefix}`);
+		throw new Error(`Invalid Type for key: ${prefix}`);
 	}
 	return res;
 }
 
-function checkType(src, dest) {
+function checkType(src: any, dest: any) {
 	let res = true;
 	if (dest != null) {
 		if (typeof dest == 'object' &&
@@ -67,7 +66,7 @@ function checkType(src, dest) {
 	return res;
 }
 
-function toPrimitive(val) {
+function toPrimitive(val: any) {
 	if (typeof val == 'object') {
 		if (val instanceof String) {
 			val = String(val);
@@ -80,11 +79,11 @@ function toPrimitive(val) {
 	return val;
 }
 
-function isPrimitive(val) {
+function isPrimitive(val: any) {
 	return (val !== Object(val));
 }
 
-function getPrimitiveClone(val) {
+function getPrimitiveClone(val: any) {
 	if (typeof val == 'string') return '';
 	else if (typeof val == 'number') return 0;
 	else if (typeof val == 'boolean') return true;

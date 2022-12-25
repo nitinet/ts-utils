@@ -1,18 +1,18 @@
-var _a;
 class Node {
+    key = null;
+    value = null;
+    height = 0;
+    left = null;
+    right = null;
     constructor(key, value) {
-        this.key = null;
-        this.value = null;
-        this.height = 0;
-        this.left = null;
-        this.right = null;
         this.key = key;
         this.value = value;
     }
 }
 class TreeMapIterator {
+    stack = [];
+    valueFunc;
     constructor(root, valueFunc) {
-        this.stack = [];
         this.stack.push(root);
         this.valueFunc = valueFunc;
     }
@@ -35,11 +35,13 @@ class TreeMapIterator {
     }
 }
 class TreeMap {
+    root = null;
+    count = 0;
+    compare = null;
+    get size() {
+        return this.count;
+    }
     constructor(option) {
-        this.root = null;
-        this.count = 0;
-        this.compare = null;
-        this[_a] = 'TreeMap';
         option = option || {};
         this.compare = option.compare ?? function (key1, key2) {
             let res = 0;
@@ -49,9 +51,6 @@ class TreeMap {
                 res = 1;
             return res;
         };
-    }
-    get size() {
-        return this.count;
     }
     height(node) {
         if (node == null)
@@ -222,6 +221,7 @@ class TreeMap {
     [Symbol.iterator]() {
         return this.entries();
     }
+    [Symbol.toStringTag] = 'TreeMap';
     getFirstEntry() {
         let node = this.root;
         if (null != node) {
@@ -298,6 +298,5 @@ class TreeMap {
         return arr;
     }
 }
-_a = Symbol.toStringTag;
 export default TreeMap;
 //# sourceMappingURL=TreeMap.js.map

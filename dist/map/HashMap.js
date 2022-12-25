@@ -1,20 +1,16 @@
-var _a;
 const InitialModulous = 16;
 class Node {
+    key = null;
+    val = null;
     constructor(key, val) {
-        this.key = null;
-        this.val = null;
         this.key = key;
         this.val = val;
     }
 }
 class HashMap {
-    constructor() {
-        this.valArr = new Array();
-        this.modulous = InitialModulous;
-        this.count = 0;
-        this[_a] = 'HashMap';
-    }
+    valArr = new Array();
+    modulous = InitialModulous;
+    count = 0;
     hashFunc(key) {
         let res = 0;
         let temp = null;
@@ -190,6 +186,7 @@ class HashMap {
     [Symbol.iterator]() {
         return this.entries();
     }
+    [Symbol.toStringTag] = 'HashMap';
     toJSON() {
         let arr = [];
         this.forEach((value, key) => {
@@ -198,6 +195,5 @@ class HashMap {
         return arr;
     }
 }
-_a = Symbol.toStringTag;
 export default HashMap;
 //# sourceMappingURL=HashMap.js.map

@@ -1,9 +1,10 @@
 class ObjectPool {
+    entityType;
+    poolSize = 0;
+    lowerLimitCount = 0;
+    idx = 0;
+    pool = new Array();
     constructor(entityType, poolSize) {
-        this.poolSize = 0;
-        this.lowerLimitCount = 0;
-        this.idx = 0;
-        this.pool = new Array();
         this.entityType = entityType;
         this.setPoolSize(poolSize);
         this.fillPool();

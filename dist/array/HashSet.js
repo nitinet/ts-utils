@@ -1,7 +1,5 @@
 class HashSet {
-    constructor() {
-        this.size = 0;
-    }
+    size = 0;
     add(value) {
         throw new Error("Method not implemented.");
     }
@@ -29,7 +27,7 @@ class HashSet {
     [Symbol.iterator]() {
         throw new Error("Method not implemented.");
     }
+    [Symbol.toStringTag];
 }
-Symbol.toStringTag;
 export default HashSet;
 //# sourceMappingURL=HashSet.js.map

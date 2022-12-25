@@ -1,4 +1,3 @@
-import ValidationError from './ValidationError.js';
 function parseStrict(src, res, prefix) {
     if (res == null) {
         res = src;
@@ -32,13 +31,13 @@ function parseStrict(src, res, prefix) {
                     }
                 }
                 else {
-                    throw new ValidationError(`Invalid Type for key: ${prefix}`);
+                    throw new Error(`Invalid Type for key: ${prefix}`);
                 }
             }
             else {
                 Object.entries(res).forEach(([key, val]) => {
                     let prefixKey = prefix ? `${prefix}.${key}` : key;
-                    res[key] = parseStrict(src[key], val, prefixKey);
+                    Reflect.set(res, key, parseStrict(src[key], val, prefixKey));
                 });
             }
         }
@@ -51,7 +50,7 @@ function parseStrict(src, res, prefix) {
         }
     }
     else {
-        throw new ValidationError(`Invalid Type for key: ${prefix}`);
+        throw new Error(`Invalid Type for key: ${prefix}`);
     }
     return res;
 }

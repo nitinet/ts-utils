@@ -374,7 +374,7 @@ class TreeMap<K, V> implements Map<K, V>{
 	}
 
 	toJSON() {
-		let arr = [];
+		let arr: { key: K, val: V }[] = [];
 		this.forEach((value, key) => {
 			arr.push({ key, val: value });
 		});

@@ -1,12 +1,8 @@
 import ObjectPool from './ObjectPool.js';
-import parseStrict from './parseStrict.js';
 import toPaths from './toPaths.js';
-import ValidationError from './ValidationError.js';
 export default {
     ObjectPool,
-    parseStrict,
-    toPaths,
-    ValidationError
+    toPaths
 };
-export { ObjectPool, parseStrict, toPaths, ValidationError };
+export { ObjectPool, toPaths };
 //# sourceMappingURL=index.js.map
