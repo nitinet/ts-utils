@@ -30,7 +30,7 @@ class HashSet<T> implements Set<T> {
 	[Symbol.iterator](): IterableIterator<T> {
 		throw new Error("Method not implemented.");
 	}
-	[Symbol.toStringTag]: string;
+	[Symbol.toStringTag]: string = '';
 
 }
 

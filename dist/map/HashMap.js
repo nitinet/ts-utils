@@ -1,7 +1,7 @@
 const InitialModulous = 16;
 class Node {
-    key = null;
-    val = null;
+    key;
+    val;
     constructor(key, val) {
         this.key = key;
         this.val = val;
@@ -13,7 +13,6 @@ class HashMap {
     count = 0;
     hashFunc(key) {
         let res = 0;
-        let temp = null;
         switch (typeof key) {
             case 'boolean': {
                 res = key ? 1 : 0;
@@ -27,16 +26,14 @@ class HashMap {
             case 'bigint':
             case 'symbol':
             case 'string': {
-                temp = key.toString();
+                res = this.strHashCode(key.toString());
                 break;
             }
             case 'object': {
-                temp = JSON.stringify(key);
+                res = this.strHashCode(JSON.stringify(key));
                 break;
             }
         }
-        if (temp)
-            res = this.strHashCode(temp);
         return res;
     }
     strHashCode(str) {
@@ -111,11 +108,10 @@ class HashMap {
         return true;
     }
     forEach(callbackfn, thisArg) {
-        if (!thisArg)
-            thisArg = this;
-        thisArg.valArr.forEach((obj) => {
+        let that = thisArg ?? this;
+        that.valArr.forEach((obj) => {
             if (obj != null) {
-                callbackfn(obj.val, obj.key, thisArg);
+                callbackfn(obj.val, obj.key, that);
             }
         });
     }
@@ -123,7 +119,7 @@ class HashMap {
         let hashNum = this.hashFunc(key);
         let idx = this.indexCode(hashNum);
         let obj = this.valArr[idx];
-        return obj ? obj.val : null;
+        return obj ? obj.val : undefined;
     }
     has(key) {
         let hashNum = this.hashFunc(key);

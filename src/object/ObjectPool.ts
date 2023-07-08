@@ -7,7 +7,7 @@ class ObjectPool<T extends IResetEntity>{
 	private lowerLimitCount: number = 0;
 	private idx: number = 0;
 
-	pool: T[] = new Array<T>();
+	pool = new Array<T | null>();
 
 	constructor(entityType: IEntityType<T>, poolSize?: number) {
 		this.entityType = entityType;
@@ -30,7 +30,7 @@ class ObjectPool<T extends IResetEntity>{
 
 	private fillPool() {
 		let count = this.poolSize - this.pool.length;
-		let temp = new Array<T>(count).fill(null);
+		let temp = new Array<T>(count);
 		for (let i = 0; i < count; i++) {
 			temp[i] = new this.entityType();
 		}

@@ -27,7 +27,7 @@ class HashSet {
     [Symbol.iterator]() {
         throw new Error("Method not implemented.");
     }
-    [Symbol.toStringTag];
+    [Symbol.toStringTag] = '';
 }
 export default HashSet;
 //# sourceMappingURL=HashSet.js.map

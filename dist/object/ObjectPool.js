@@ -21,7 +21,7 @@ class ObjectPool {
     }
     fillPool() {
         let count = this.poolSize - this.pool.length;
-        let temp = new Array(count).fill(null);
+        let temp = new Array(count);
         for (let i = 0; i < count; i++) {
             temp[i] = new this.entityType();
         }

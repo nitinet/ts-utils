@@ -1,10 +1,10 @@
 class Node<K, V> {
-	key: K = null;
-	value: V = null;
+	key: K;
+	value: V;
 	height: number = 0;
 
-	left: Node<K, V> = null;
-	right: Node<K, V> = null;
+	left: Node<K, V> | null = null;
+	right: Node<K, V> | null = null;
 
 	constructor(key: K, value: V) {
 		this.key = key;
@@ -17,41 +17,41 @@ interface IOption<K> {
 	compare?: (key1: K, key2: K) => number;
 }
 
-class TreeMapIterator<V> implements IterableIterator<V>{
-	stack: Node<any, any>[] = [];
+class TreeMapIterator<R, K, V> implements IterableIterator<R>{
+	stack: Node<K, V>[] = [];
 
-	valueFunc: (obj: Node<any, any>) => V;
+	valueFunc: (obj: Node<K, V>) => R;
 
-	constructor(root: Node<any, any>, valueFunc: (obj: Node<any, any>) => V) {
-		this.stack.push(root);
+	constructor(root: Node<K, V> | null, valueFunc: (obj: Node<K, V>) => R) {
+		if (root) this.stack.push(root);
 		this.valueFunc = valueFunc;
 	}
 
 	next() {
-		let value: V = null;
-		let done = true;
 		let node = this.stack.shift();
 		if (node != null) {
 			if (node.left) this.stack.push(node.left);
 			if (node.right) this.stack.push(node.right);
 
-			value = this.valueFunc(node);
-			done = false;
+			let value = this.valueFunc(node);
+			return { value }
+		} else {
+			let done = true as const;
+			return { done, value: null };
 		}
-		return { value, done }
 	}
 
-	[Symbol.iterator](): IterableIterator<V> {
+	[Symbol.iterator](): IterableIterator<R> {
 		return this;
 	}
 }
 
 class TreeMap<K, V> implements Map<K, V>{
 
-	private root: Node<K, V> = null;
+	private root: Node<K, V> | null = null;
 	private count: number = 0;
 
-	private compare: (key1: K, key2: K) => number = null;
+	private compare: (key1: K, key2: K) => number;
 
 	get size(): number {
 		return this.count;
@@ -68,14 +68,16 @@ class TreeMap<K, V> implements Map<K, V>{
 	}
 
 	// A utility function to get the height of the tree
-	private height(node: Node<K, V>) {
-		if (node == null) return 0;
-		return node.height;
+	private height(node: Node<K, V> | null) {
+		let height = (node != null) ? node.height : 0;
+		return height;
 	}
 
 	// A utility function to right rotate subtree rooted with y
 	private rightRotate(node: Node<K, V>) {
 		let x = node.left;
+		if (!x) return node;
+
 		let T2 = x.right;
 
 		// Perform rotation
@@ -93,6 +95,8 @@ class TreeMap<K, V> implements Map<K, V>{
 	// A utility function to left rotate subtree rooted with x
 	private leftRotate(node: Node<K, V>) {
 		let y = node.right;
+		if (!y) return node;
+
 		let T2 = y.left;
 
 		// Perform rotation
@@ -108,12 +112,12 @@ class TreeMap<K, V> implements Map<K, V>{
 	}
 
 	// Get Balance factor of node N
-	private getBalance(node: Node<K, V>) {
-		if (node == null) return 0;
-		return this.height(node.left) - this.height(node.right);
+	private getBalance(node: Node<K, V> | null) {
+		let bal = (node != null) ? this.height(node.left) - this.height(node.right) : 0;
+		return bal;
 	}
 
-	private insert(node: Node<K, V>, newNode: Node<K, V>) {
+	private insert(node: Node<K, V> | null, newNode: Node<K, V>) {
 		/* 1.  Perform the normal BST insertion */
 		if (node == null) {
 			this.count++;
@@ -136,20 +140,20 @@ class TreeMap<K, V> implements Map<K, V>{
 
 		// If this node becomes unbalanced, then there are 4 cases
 		// Left Left Case
-		if (balance > 1 && this.compare(newNode.key, node.left.key) < 0) return this.rightRotate(node);
+		if (balance > 1 && node.left && this.compare(newNode.key, node.left.key) < 0) return this.rightRotate(node);
 
 		// Right Right Case
-		if (balance < -1 && this.compare(newNode.key, node.right.key) > 0) return this.leftRotate(node);
+		if (balance < -1 && node.right && this.compare(newNode.key, node.right.key) > 0) return this.leftRotate(node);
 
 		// Left Right Case
-		if (balance > 1 && this.compare(newNode.key, node.left.key) > 0) {
-			node.left = this.leftRotate(node.left);
+		if (balance > 1 && node.left && this.compare(newNode.key, node.left.key) > 0) {
+			node.left = node.left ? this.leftRotate(node.left) : null;
 			return this.rightRotate(node);
 		}
 
 		// Right Left Case
-		if (balance < -1 && this.compare(newNode.key, node.right.key) < 0) {
-			node.right = this.rightRotate(node.right);
+		if (balance < -1 && node.right && this.compare(newNode.key, node.right.key) < 0) {
+			node.right = node.right ? this.rightRotate(node.right) : null;
 			return this.leftRotate(node);
 		}
 
@@ -163,16 +167,14 @@ class TreeMap<K, V> implements Map<K, V>{
 		let current = node;
 
 		/* loop down to find the leftmost leaf */
-		while (current.left != null)
-			current = current.left;
+		while (current.left != null) current = current.left;
 
 		return current;
 	}
 
-	private deleteNode(node: Node<K, V>, key: K) {
+	private deleteNode(node: Node<K, V> | null, key: K) {
 		// STEP 1: PERFORM STANDARD BST DELETE 
-		if (node == null)
-			return node;
+		if (node == null) return node;
 
 		// If the key to be deleted is smaller than the root's key, then it lies in left subtree 
 		if (key < node.key) node.left = this.deleteNode(node.left, key);
@@ -184,7 +186,7 @@ class TreeMap<K, V> implements Map<K, V>{
 		else {
 			// node with only one child or no child 
 			if ((node.left == null) || (node.right == null)) {
-				let temp: Node<K, V> = null;
+				let temp: Node<K, V> | null = null;
 				if (null == node.left) {
 					temp = node.right;
 				} else {
@@ -222,7 +224,7 @@ class TreeMap<K, V> implements Map<K, V>{
 
 		// Left Right Case 
 		if (balance > 1 && this.getBalance(node.left) < 0) {
-			node.left = this.leftRotate(node.left);
+			node.left = node.left ? this.leftRotate(node.left) : null;
 			return this.rightRotate(node);
 		}
 
@@ -232,7 +234,7 @@ class TreeMap<K, V> implements Map<K, V>{
 
 		// Right Left Case 
 		if (balance < -1 && this.getBalance(node.right) > 0) {
-			node.right = this.rightRotate(node.right);
+			node.right = node.right ? this.rightRotate(node.right) : null;
 			return this.leftRotate(node);
 		}
 
@@ -243,7 +245,7 @@ class TreeMap<K, V> implements Map<K, V>{
 		this.root = null;
 	}
 
-	private runForEach(node: Node<K, V>, callbackfunc: (value: V, key: K, map: Map<K, V>) => void) {
+	private runForEach(node: Node<K, V> | null, callbackfunc: (value: V, key: K, map: Map<K, V>) => void) {
 		if (node != null) {
 			this.runForEach(node.left, callbackfunc);
 			callbackfunc(node.value, node.key, this);
@@ -255,7 +257,7 @@ class TreeMap<K, V> implements Map<K, V>{
 		this.runForEach(this.root, callbackfn);
 	}
 
-	get(key: K): V {
+	get(key: K): V | undefined {
 		let node = this.root;
 		while (true) {
 			if (node == null) break;
@@ -266,7 +268,7 @@ class TreeMap<K, V> implements Map<K, V>{
 				else break;
 			}
 		}
-		return node ? node.value : null;
+		return node ? node.value : undefined;
 	}
 
 	has(key: K): boolean {
@@ -285,21 +287,21 @@ class TreeMap<K, V> implements Map<K, V>{
 	}
 
 	entries(): IterableIterator<[K, V]> {
-		let iterator = new TreeMapIterator<[K, V]>(this.root, (node) => {
+		let iterator = new TreeMapIterator<[K, V], K, V>(this.root, (node) => {
 			return [node.key, node.value]
 		});
 		return iterator;
 	}
 
 	keys(): IterableIterator<K> {
-		let iterator = new TreeMapIterator<K>(this.root, (node) => {
+		let iterator = new TreeMapIterator<K, K, V>(this.root, (node) => {
 			return node.key;
 		});
 		return iterator;
 	}
 
 	values(): IterableIterator<V> {
-		let iterator = new TreeMapIterator<V>(this.root, (node) => {
+		let iterator = new TreeMapIterator<V, K, V>(this.root, (node) => {
 			return node.value;
 		});
 		return iterator;
@@ -311,66 +313,74 @@ class TreeMap<K, V> implements Map<K, V>{
 
 	[Symbol.toStringTag]: string = 'TreeMap';
 
-	getFirstEntry(): [K, V] {
+	getFirstEntry(): [K, V] | null {
 		let node = this.root;
-		if (null != node) {
+		if (node) {
 			while (node.left != null) node = node.left;
 		}
-		let key = node ? node.key : null;
-		let value = node ? node.value : null;
-		return [key, value];
+		if (node) return [node.key, node.value];
+		else return null;
 	}
 
-	getLastEntry(): [K, V] {
+	getLastEntry(): [K, V] | null {
 		let node = this.root;
 		if (null != node) {
 			while (node.right != null) node = node.right;
 		}
-		let key = node ? node.key : null;
-		let value = node ? node.value : null;
-		return [key, value];
+		if (node) return [node.key, node.value];
+		else return null;
 	}
 
 	getCeilingKey(key: K) {
-		return this.getCeilingEntry(key)[0];
+		let entry = this.getCeilingEntry(key);
+		if (entry) return entry[0];
+		else return null;
 	}
 
-	getCeilingEntry(key: K): [K, V] {
+	getCeilingEntry(key: K): [K, V] | null {
 		let node = this.root;
+		if (!node) return null;
+
 		while (true) {
-			let comp = node ? this.compare(key, node.key) : 0;
-			if (comp < 0) {
-				let leftComp = node.left ? this.compare(key, node.left.key) : 1;
-				if (leftComp > 0) break;
-				else node = node.left;
-			} else if (comp > 0) {
-				node = node.right;
+			if (node) {
+				let comp = this.compare(key, node.key);
+				if (comp < 0) {
+					let leftComp = node.left ? this.compare(key, node.left.key) : 1;
+					if (leftComp > 0) break;
+					else node = node.left;
+				} else if (comp > 0) {
+					node = node.right;
+				} else break;
 			} else break;
 		}
-		let resKey = node ? node.key : null;
-		let value = node ? node.value : null;
-		return [resKey, value];
+		if (node) return [node.key, node.value];
+		else return null;
 	}
 
-	getFloorKey(key: K): K {
-		return this.getFloorEntry(key)[0];
+	getFloorKey(key: K) {
+		let entry = this.getFloorEntry(key);
+		if (entry) return entry[0];
+		else return null;
 	}
 
-	getFloorEntry(key: K): [K, V] {
+	getFloorEntry(key: K): [K, V] | null {
 		let node = this.root;
+		if (!node) return null;
+
 		while (true) {
-			let comp = node ? this.compare(key, node.key) : 0;
-			if (comp < 0) {
-				node = node.left;
-			} else if (comp > 0) {
-				let rightComp = node.right ? this.compare(key, node.right.key) : -1;
-				if (rightComp < 0) break;
-				else node = node.right;
+			if (node) {
+				let comp = this.compare(key, node.key);
+				if (comp < 0) {
+					node = node.left;
+				} else if (comp > 0) {
+					let rightComp = node.right ? this.compare(key, node.right.key) : -1;
+					if (rightComp < 0) break;
+					else node = node.right;
+				} else break;
 			} else break;
 		}
-		let resKey = node ? node.key : null;
-		let value = node ? node.value : null;
-		return [resKey, value];
+		if (node) return [node.key, node.value];
+		else return null;
 	}
 
 	toJSON() {

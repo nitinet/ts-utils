@@ -1,22 +1,26 @@
 function toPaths(obj, target, prefix) {
     target = target || [];
     prefix = prefix || '';
-    Object.entries(obj).forEach(([objKey, value]) => {
-        let key = prefix ? `${prefix}.${objKey}` : objKey;
-        if (value && typeof value === 'object') {
-            if (Array.isArray(value)) {
-                value.forEach((val, idx) => {
-                    target = toPaths(val, target, `${key}[${idx}]`);
-                });
-            }
-            else {
-                target = toPaths(value, target, key);
-            }
+    target = getPaths(obj, target, prefix);
+    return target;
+}
+function getPaths(obj, target, prefix) {
+    if (obj && typeof obj === 'object') {
+        if (Array.isArray(obj)) {
+            obj.forEach((val, idx) => {
+                target = getPaths(val, target, `${prefix}[${idx}]`);
+            });
         }
         else {
-            return target.push({ key, value });
+            Object.entries(obj).forEach(([objKey, value]) => {
+                let key = prefix ? `${prefix}.${objKey}` : objKey;
+                target = getPaths(value, target, key);
+            });
         }
-    });
+    }
+    else {
+        target.push({ key: prefix, value: obj });
+    }
     return target;
 }
 export default toPaths;

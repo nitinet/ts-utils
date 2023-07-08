@@ -1,8 +1,8 @@
 const InitialModulous = 16;
 
 class Node<K, V>{
-	key: K = null;
-	val: V = null;
+	key: K;
+	val: V;
 
 	constructor(key: K, val: V) {
 		this.key = key;
@@ -11,13 +11,12 @@ class Node<K, V>{
 }
 
 class HashMap<K, V> implements Map<K, V>{
-	private valArr: Node<K, V>[] = new Array<Node<K, V>>();
+	private valArr: (Node<K, V> | null)[] = new Array<Node<K, V>>();
 	private modulous: number = InitialModulous;
 	private count: number = 0;
 
 	private hashFunc(key: K): number {
 		let res = 0;
-		let temp: string = null;
 		switch (typeof key) {
 			case 'boolean': {
 				res = key ? 1 : 0;
@@ -31,15 +30,14 @@ class HashMap<K, V> implements Map<K, V>{
 			case 'bigint':
 			case 'symbol':
 			case 'string': {
-				temp = key.toString();
+				res = this.strHashCode(key.toString());
 				break;
 			}
 			case 'object': {
-				temp = JSON.stringify(key);
+				res = this.strHashCode(JSON.stringify(key));
 				break;
 			}
 		}
-		if (temp) res = this.strHashCode(temp);
 		return res;
 	}
 
@@ -127,20 +125,20 @@ class HashMap<K, V> implements Map<K, V>{
 	}
 
 	forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: HashMap<K, V>): void {
-		if (!thisArg) thisArg = this;
-		thisArg.valArr.forEach((obj) => {
+		let that = thisArg ?? this;
+		that.valArr.forEach((obj) => {
 			if (obj != null) {
-				callbackfn(obj.val, obj.key, thisArg);
+				callbackfn(obj.val, obj.key, that);
 			}
 		});
 	}
 
-	get(key: K): V {
+	get(key: K): V | undefined {
 		let hashNum = this.hashFunc(key);
 		let idx = this.indexCode(hashNum);
 		let obj = this.valArr[idx];
 
-		return obj ? obj.val : null;
+		return obj ? obj.val : undefined;
 	}
 
 	has(key: K): boolean {
