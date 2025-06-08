@@ -17,7 +17,7 @@ interface IOption<K> {
 	compare?: (key1: K, key2: K) => number;
 }
 
-class TreeMapIterator<R, K, V> implements IterableIterator<R>{
+class TreeMapIterator<R, K, V> implements IterableIterator<R> {
 	stack: Node<K, V>[] = [];
 
 	valueFunc: (obj: Node<K, V>) => R;
@@ -34,7 +34,7 @@ class TreeMapIterator<R, K, V> implements IterableIterator<R>{
 			if (node.right) this.stack.push(node.right);
 
 			let value = this.valueFunc(node);
-			return { value }
+			return { value };
 		} else {
 			let done = true as const;
 			return { done, value: null };
@@ -46,8 +46,7 @@ class TreeMapIterator<R, K, V> implements IterableIterator<R>{
 	}
 }
 
-class TreeMap<K, V> implements Map<K, V>{
-
+class TreeMap<K, V> extends Map<K, V> {
 	private root: Node<K, V> | null = null;
 	private count: number = 0;
 
@@ -58,18 +57,22 @@ class TreeMap<K, V> implements Map<K, V>{
 	}
 
 	constructor(option?: IOption<K>) {
+		super();
+
 		option = option || {};
-		this.compare = option.compare ?? function (key1: K, key2: K) {
-			let res = 0;
-			if (key1 < key2) res = -1;
-			else if (key1 > key2) res = 1;
-			return res;
-		}
+		this.compare =
+			option.compare ??
+			function (key1: K, key2: K) {
+				let res = 0;
+				if (key1 < key2) res = -1;
+				else if (key1 > key2) res = 1;
+				return res;
+			};
 	}
 
 	// A utility function to get the height of the tree
 	private height(node: Node<K, V> | null) {
-		let height = (node != null) ? node.height : 0;
+		let height = node != null ? node.height : 0;
 		return height;
 	}
 
@@ -113,7 +116,8 @@ class TreeMap<K, V> implements Map<K, V>{
 
 	// Get Balance factor of node N
 	private getBalance(node: Node<K, V> | null) {
-		let bal = (node != null) ? this.height(node.left) - this.height(node.right) : 0;
+		let bal =
+			node != null ? this.height(node.left) - this.height(node.right) : 0;
 		return bal;
 	}
 
@@ -125,12 +129,10 @@ class TreeMap<K, V> implements Map<K, V>{
 		}
 
 		let comp = this.compare(newNode.key, node.key);
-		if (comp < 0)
-			node.left = this.insert(node.left, newNode);
-		else if (comp > 0)
-			node.right = this.insert(node.right, newNode);
-		else // Duplicate keys not allowed
-			return node;
+		if (comp < 0) node.left = this.insert(node.left, newNode);
+		else if (comp > 0) node.right = this.insert(node.right, newNode);
+		// Duplicate keys not allowed
+		else return node;
 
 		/* 2. Update height of this ancestor node */
 		node.height = 1 + Math.max(this.height(node.left), this.height(node.right));
@@ -140,19 +142,37 @@ class TreeMap<K, V> implements Map<K, V>{
 
 		// If this node becomes unbalanced, then there are 4 cases
 		// Left Left Case
-		if (balance > 1 && node.left && this.compare(newNode.key, node.left.key) < 0) return this.rightRotate(node);
+		if (
+			balance > 1 &&
+			node.left &&
+			this.compare(newNode.key, node.left.key) < 0
+		)
+			return this.rightRotate(node);
 
 		// Right Right Case
-		if (balance < -1 && node.right && this.compare(newNode.key, node.right.key) > 0) return this.leftRotate(node);
+		if (
+			balance < -1 &&
+			node.right &&
+			this.compare(newNode.key, node.right.key) > 0
+		)
+			return this.leftRotate(node);
 
 		// Left Right Case
-		if (balance > 1 && node.left && this.compare(newNode.key, node.left.key) > 0) {
+		if (
+			balance > 1 &&
+			node.left &&
+			this.compare(newNode.key, node.left.key) > 0
+		) {
 			node.left = node.left ? this.leftRotate(node.left) : null;
 			return this.rightRotate(node);
 		}
 
 		// Right Left Case
-		if (balance < -1 && node.right && this.compare(newNode.key, node.right.key) < 0) {
+		if (
+			balance < -1 &&
+			node.right &&
+			this.compare(newNode.key, node.right.key) < 0
+		) {
 			node.right = node.right ? this.rightRotate(node.right) : null;
 			return this.leftRotate(node);
 		}
@@ -173,19 +193,17 @@ class TreeMap<K, V> implements Map<K, V>{
 	}
 
 	private deleteNode(node: Node<K, V> | null, key: K) {
-		// STEP 1: PERFORM STANDARD BST DELETE 
+		// STEP 1: PERFORM STANDARD BST DELETE
 		if (node == null) return node;
 
-		// If the key to be deleted is smaller than the root's key, then it lies in left subtree 
+		// If the key to be deleted is smaller than the root's key, then it lies in left subtree
 		if (key < node.key) node.left = this.deleteNode(node.left, key);
-
-		// If the key to be deleted is greater than the root's key, then it lies in right subtree 
+		// If the key to be deleted is greater than the root's key, then it lies in right subtree
 		else if (key > node.key) node.right = this.deleteNode(node.right, key);
-
-		// if key is same as root's key, then this is the node to be deleted 
+		// if key is same as root's key, then this is the node to be deleted
 		else {
-			// node with only one child or no child 
-			if ((node.left == null) || (node.right == null)) {
+			// node with only one child or no child
+			if (node.left == null || node.right == null) {
 				let temp: Node<K, V> | null = null;
 				if (null == node.left) {
 					temp = node.right;
@@ -196,43 +214,44 @@ class TreeMap<K, V> implements Map<K, V>{
 				node = temp;
 				this.count--;
 			} else {
-				// node with two children: Get the inorder successor (smallest in the right subtree) 
+				// node with two children: Get the inorder successor (smallest in the right subtree)
 				let temp: Node<K, V> = this.minValueNode(node.right);
 
-				// Copy the inorder successor's data to this node 
+				// Copy the inorder successor's data to this node
 				node.key = temp.key;
 				node.value = temp.value;
 
-				// Delete the inorder successor 
+				// Delete the inorder successor
 				node.right = this.deleteNode(node.right, temp.key);
 			}
 		}
 
-		// If the tree had only one node then return 
+		// If the tree had only one node then return
 		if (node == null) return node;
 
-		// STEP 2: UPDATE HEIGHT OF THE CURRENT NODE 
+		// STEP 2: UPDATE HEIGHT OF THE CURRENT NODE
 		node.height = Math.max(this.height(node.left), this.height(node.right)) + 1;
 
-		// STEP 3: GET THE BALANCE FACTOR OF THIS NODE (to check whether 
-		// this node became unbalanced) 
+		// STEP 3: GET THE BALANCE FACTOR OF THIS NODE (to check whether
+		// this node became unbalanced)
 		let balance = this.getBalance(node);
 
-		// If this node becomes unbalanced, then there are 4 cases 
-		// Left Left Case 
-		if (balance > 1 && this.getBalance(node.left) >= 0) return this.rightRotate(node);
+		// If this node becomes unbalanced, then there are 4 cases
+		// Left Left Case
+		if (balance > 1 && this.getBalance(node.left) >= 0)
+			return this.rightRotate(node);
 
-		// Left Right Case 
+		// Left Right Case
 		if (balance > 1 && this.getBalance(node.left) < 0) {
 			node.left = node.left ? this.leftRotate(node.left) : null;
 			return this.rightRotate(node);
 		}
 
-		// Right Right Case 
+		// Right Right Case
 		if (balance < -1 && this.getBalance(node.right) <= 0)
 			return this.leftRotate(node);
 
-		// Right Left Case 
+		// Right Left Case
 		if (balance < -1 && this.getBalance(node.right) > 0) {
 			node.right = node.right ? this.rightRotate(node.right) : null;
 			return this.leftRotate(node);
@@ -245,7 +264,10 @@ class TreeMap<K, V> implements Map<K, V>{
 		this.root = null;
 	}
 
-	private runForEach(node: Node<K, V> | null, callbackfunc: (value: V, key: K, map: Map<K, V>) => void) {
+	private runForEach(
+		node: Node<K, V> | null,
+		callbackfunc: (value: V, key: K, map: Map<K, V>) => void
+	) {
 		if (node != null) {
 			this.runForEach(node.left, callbackfunc);
 			callbackfunc(node.value, node.key, this);
@@ -288,7 +310,7 @@ class TreeMap<K, V> implements Map<K, V>{
 
 	entries(): IterableIterator<[K, V]> {
 		let iterator = new TreeMapIterator<[K, V], K, V>(this.root, (node) => {
-			return [node.key, node.value]
+			return [node.key, node.value];
 		});
 		return iterator;
 	}
@@ -384,13 +406,12 @@ class TreeMap<K, V> implements Map<K, V>{
 	}
 
 	toJSON() {
-		let arr: { key: K, val: V }[] = [];
+		let arr: { key: K; val: V }[] = [];
 		this.forEach((value, key) => {
 			arr.push({ key, val: value });
 		});
 		return arr;
 	}
-
 }
 
 export default TreeMap;

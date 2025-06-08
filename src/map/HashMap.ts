@@ -1,6 +1,6 @@
-const InitialModulous = 16;
+const INITIAL_MODULOUS = 16;
 
-class Node<K, V>{
+class Node<K, V> {
 	key: K;
 	val: V;
 
@@ -10,9 +10,9 @@ class Node<K, V>{
 	}
 }
 
-class HashMap<K, V> implements Map<K, V>{
+class HashMap<K, V> extends Map<K, V> {
 	private valArr: (Node<K, V> | null)[] = new Array<Node<K, V>>();
-	private modulous: number = InitialModulous;
+	private modulous: number = INITIAL_MODULOUS;
 	private count: number = 0;
 
 	private hashFunc(key: K): number {
@@ -47,7 +47,7 @@ class HashMap<K, V> implements Map<K, V>{
 		if (str.length == 0) return hash;
 		for (let i = 0; i < str.length; i++) {
 			let char = str.charCodeAt(i);
-			hash = ((hash << 5) - hash) + char;
+			hash = (hash << 5) - hash + char;
 			hash = hash & hash; // Convert to 32bit integer
 		}
 		return hash;
@@ -58,7 +58,7 @@ class HashMap<K, V> implements Map<K, V>{
 	}
 
 	private expand() {
-		this.valArr.splice(0, 0, ...(new Array<Node<K, V>>(this.modulous)));
+		this.valArr.splice(0, 0, ...new Array<Node<K, V>>(this.modulous));
 
 		this.modulous *= 2;
 
@@ -109,7 +109,7 @@ class HashMap<K, V> implements Map<K, V>{
 
 	clear(): void {
 		this.valArr = new Array();
-		this.modulous = InitialModulous;
+		this.modulous = INITIAL_MODULOUS;
 		this.count = 0;
 	}
 
@@ -124,7 +124,10 @@ class HashMap<K, V> implements Map<K, V>{
 		return true;
 	}
 
-	forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: HashMap<K, V>): void {
+	forEach(
+		callbackfn: (value: V, key: K, map: Map<K, V>) => void,
+		thisArg?: HashMap<K, V>
+	): void {
 		let that = thisArg ?? this;
 		that.valArr.forEach((obj) => {
 			if (obj != null) {
@@ -171,13 +174,17 @@ class HashMap<K, V> implements Map<K, V>{
 		return {
 			next() {
 				let itrVal = valsItr.next();
-				let obj: Node<K, V> = itrVal?.value;
-				return { value: [obj?.key, obj?.val], done: itrVal.done };
+				let obj = itrVal?.value;
+				if (obj) {
+					return { value: [obj.key, obj.val], done: itrVal.done };
+				} else {
+					return { value: null, done: true };
+				}
 			},
 
 			[Symbol.iterator](): IterableIterator<[K, V]> {
 				return this;
-			}
+			},
 		};
 	}
 
@@ -185,15 +192,19 @@ class HashMap<K, V> implements Map<K, V>{
 		let valsItr = this.valArr.values();
 
 		return {
-			next() {
+			next(): IteratorResult<K> {
 				let itrVal = valsItr.next();
-				let obj: Node<K, V> = itrVal?.value;
-				return { value: obj?.key, done: itrVal.done };
+				let obj = itrVal.value;
+				if (obj) {
+					return { value: obj.key, done: itrVal.done };
+				} else {
+					return { value: null, done: true };
+				}
 			},
 
 			[Symbol.iterator](): IterableIterator<K> {
 				return this;
-			}
+			},
 		};
 	}
 
@@ -203,13 +214,17 @@ class HashMap<K, V> implements Map<K, V>{
 		return {
 			next() {
 				let itrVal = valsItr.next();
-				let obj: Node<K, V> = itrVal?.value;
-				return { value: obj?.val, done: itrVal.done };
+				let obj = itrVal?.value;
+				if (obj) {
+					return { value: obj.val, done: itrVal.done };
+				} else {
+					return { value: null, done: true };
+				}
 			},
 
 			[Symbol.iterator](): IterableIterator<V> {
 				return this;
-			}
+			},
 		};
 	}
 
@@ -220,13 +235,12 @@ class HashMap<K, V> implements Map<K, V>{
 	[Symbol.toStringTag]: string = 'HashMap';
 
 	toJSON() {
-		let arr: { key: K, val: V }[] = [];
+		let arr: { key: K; val: V }[] = [];
 		this.forEach((value, key) => {
 			arr.push({ key, val: value });
 		});
 		return arr;
 	}
-
 }
 
 export default HashMap;
