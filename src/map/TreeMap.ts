@@ -17,7 +17,7 @@ interface IOption<K> {
 	compare?: (key1: K, key2: K) => number;
 }
 
-class TreeMapIterator<R, K, V> implements IterableIterator<R> {
+class TreeMapIterator<R, K, V> implements MapIterator<R> {
 	stack: Node<K, V>[] = [];
 
 	valueFunc: (obj: Node<K, V>) => R;
@@ -37,16 +37,72 @@ class TreeMapIterator<R, K, V> implements IterableIterator<R> {
 			return { value };
 		} else {
 			let done = true as const;
-			return { done, value: null };
+			return { done, value: undefined };
 		}
 	}
 
-	[Symbol.iterator](): IterableIterator<R> {
+	[Symbol.iterator](): MapIterator<R> {
 		return this;
+	}
+	[Symbol.toStringTag]: string = 'TreeMapIterator';
+
+	map<U>(callbackfn: (value: R, index: number) => U): TreeMapIterator<U, K, V> {
+		let index = 0;
+		let valueFunc = this.valueFunc;
+		let mapFunc = (node: Node<K, V>) => {
+			return callbackfn(valueFunc(node), index++);
+		};
+		return new TreeMapIterator<U, K, V>(this.stack[0], mapFunc);
+	}
+
+	filter(predicate: unknown): IteratorObject<R, undefined, unknown> {
+		throw new Error('Method not implemented.');
+	}
+	take(limit: number): IteratorObject<R, undefined, unknown> {
+		throw new Error('Method not implemented.');
+	}
+	drop(count: number): IteratorObject<R, undefined, unknown> {
+		throw new Error('Method not implemented.');
+	}
+	flatMap<U>(
+		callback: (
+			value: R,
+			index: number
+		) => Iterator<U, unknown, undefined> | Iterable<U, unknown, undefined>
+	): IteratorObject<U, undefined, unknown> {
+		throw new Error('Method not implemented.');
+	}
+	reduce(callbackfn: unknown, initialValue?: unknown): R {
+		throw new Error('Method not implemented.');
+	}
+	toArray(): R[] {
+		throw new Error('Method not implemented.');
+	}
+	forEach(callbackfn: (value: R, index: number) => void): void {
+		throw new Error('Method not implemented.');
+	}
+	some(predicate: (value: R, index: number) => unknown): boolean {
+		throw new Error('Method not implemented.');
+	}
+	every(predicate: (value: R, index: number) => unknown): boolean {
+		throw new Error('Method not implemented.');
+	}
+	find(predicate: unknown): R | undefined {
+		throw new Error('Method not implemented.');
+	}
+
+	return?(value?: undefined): IteratorResult<R, undefined> {
+		throw new Error('Method not implemented.');
+	}
+	throw?(e?: any): IteratorResult<R, undefined> {
+		throw new Error('Method not implemented.');
+	}
+	[Symbol.dispose](): void {
+		throw new Error('Method not implemented.');
 	}
 }
 
-class TreeMap<K, V> extends Map<K, V> {
+class TreeMap<K, V> implements Map<K, V> {
 	private root: Node<K, V> | null = null;
 	private count: number = 0;
 
@@ -57,8 +113,6 @@ class TreeMap<K, V> extends Map<K, V> {
 	}
 
 	constructor(option?: IOption<K>) {
-		super();
-
 		option = option || {};
 		this.compare =
 			option.compare ??
@@ -308,28 +362,28 @@ class TreeMap<K, V> extends Map<K, V> {
 		return node != null;
 	}
 
-	entries(): IterableIterator<[K, V]> {
+	entries(): MapIterator<[K, V]> {
 		let iterator = new TreeMapIterator<[K, V], K, V>(this.root, (node) => {
 			return [node.key, node.value];
 		});
 		return iterator;
 	}
 
-	keys(): IterableIterator<K> {
+	keys(): MapIterator<K> {
 		let iterator = new TreeMapIterator<K, K, V>(this.root, (node) => {
 			return node.key;
 		});
 		return iterator;
 	}
 
-	values(): IterableIterator<V> {
+	values(): MapIterator<V> {
 		let iterator = new TreeMapIterator<V, K, V>(this.root, (node) => {
 			return node.value;
 		});
 		return iterator;
 	}
 
-	[Symbol.iterator](): IterableIterator<[K, V]> {
+	[Symbol.iterator](): MapIterator<[K, V]> {
 		return this.entries();
 	}
 

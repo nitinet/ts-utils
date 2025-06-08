@@ -10,7 +10,93 @@ class Node<K, V> {
 	}
 }
 
-class HashMap<K, V> extends Map<K, V> {
+class HashMapIterator<R, K, V> implements MapIterator<R> {
+	valsItr: ArrayIterator<Node<K, V> | null>;
+
+	valueFunc: (obj: Node<K, V>) => R;
+
+	constructor(
+		valsItr: ArrayIterator<Node<K, V> | null>,
+		valueFunc: (obj: Node<K, V>) => R
+	) {
+		this.valsItr = valsItr;
+		this.valueFunc = valueFunc;
+	}
+
+	next() {
+		let itrVal = this.valsItr.next();
+		let obj = itrVal?.value;
+		if (obj) {
+			let value = this.valueFunc(obj);
+			return { value };
+		} else {
+			let done = true as const;
+			return { done, value: undefined };
+		}
+	}
+
+	[Symbol.iterator](): MapIterator<R> {
+		return this;
+	}
+	[Symbol.toStringTag]: string = 'HashMapIterator';
+
+	map<U>(callbackfn: (value: R, index: number) => U): HashMapIterator<U, K, V> {
+		let index = 0;
+		let valueFunc = this.valueFunc;
+		let mapFunc = (node: Node<K, V>) => {
+			return callbackfn(valueFunc(node), index++);
+		};
+		return new HashMapIterator<U, K, V>(this.valsItr, mapFunc);
+	}
+
+	filter(predicate: unknown): IteratorObject<R, undefined, unknown> {
+		throw new Error('Method not implemented.');
+	}
+	take(limit: number): IteratorObject<R, undefined, unknown> {
+		throw new Error('Method not implemented.');
+	}
+	drop(count: number): IteratorObject<R, undefined, unknown> {
+		throw new Error('Method not implemented.');
+	}
+	flatMap<U>(
+		callback: (
+			value: R,
+			index: number
+		) => Iterator<U, unknown, undefined> | Iterable<U, unknown, undefined>
+	): IteratorObject<U, undefined, unknown> {
+		throw new Error('Method not implemented.');
+	}
+	reduce(callbackfn: unknown, initialValue?: unknown): R {
+		throw new Error('Method not implemented.');
+	}
+	toArray(): R[] {
+		throw new Error('Method not implemented.');
+	}
+	forEach(callbackfn: (value: R, index: number) => void): void {
+		throw new Error('Method not implemented.');
+	}
+	some(predicate: (value: R, index: number) => unknown): boolean {
+		throw new Error('Method not implemented.');
+	}
+	every(predicate: (value: R, index: number) => unknown): boolean {
+		throw new Error('Method not implemented.');
+	}
+	find(predicate: unknown): R | undefined {
+		throw new Error('Method not implemented.');
+	}
+
+	return?(value?: undefined): IteratorResult<R, undefined> {
+		throw new Error('Method not implemented.');
+	}
+	throw?(e?: any): IteratorResult<R, undefined> {
+		throw new Error('Method not implemented.');
+	}
+	[Symbol.dispose](): void {
+		throw new Error('Method not implemented.');
+	}
+}
+
+class HashMap<K, V> implements Map<K, V> {
 	private valArr: (Node<K, V> | null)[] = new Array<Node<K, V>>();
 	private modulous: number = INITIAL_MODULOUS;
 	private count: number = 0;
@@ -168,67 +254,37 @@ class HashMap<K, V> extends Map<K, V> {
 		return this;
 	}
 
-	entries(): IterableIterator<[K, V]> {
-		let valsItr = this.valArr.values();
-
-		return {
-			next() {
-				let itrVal = valsItr.next();
-				let obj = itrVal?.value;
-				if (obj) {
-					return { value: [obj.key, obj.val], done: itrVal.done };
-				} else {
-					return { value: null, done: true };
-				}
-			},
-
-			[Symbol.iterator](): IterableIterator<[K, V]> {
-				return this;
-			},
-		};
+	entries(): MapIterator<[K, V]> {
+		let iterator = new HashMapIterator<[K, V], K, V>(
+			this.valArr.values(),
+			(node) => {
+				return [node.key, node.val];
+			}
+		);
+		return iterator;
 	}
 
-	keys(): IterableIterator<K> {
-		let valsItr = this.valArr.values();
-
-		return {
-			next(): IteratorResult<K> {
-				let itrVal = valsItr.next();
-				let obj = itrVal.value;
-				if (obj) {
-					return { value: obj.key, done: itrVal.done };
-				} else {
-					return { value: null, done: true };
-				}
-			},
-
-			[Symbol.iterator](): IterableIterator<K> {
-				return this;
-			},
-		};
+	keys(): MapIterator<K> {
+		let iterator = new HashMapIterator<K, K, V>(
+			this.valArr.values(),
+			(node) => {
+				return node.key;
+			}
+		);
+		return iterator;
 	}
 
-	values(): IterableIterator<V> {
-		let valsItr = this.valArr.values();
-
-		return {
-			next() {
-				let itrVal = valsItr.next();
-				let obj = itrVal?.value;
-				if (obj) {
-					return { value: obj.val, done: itrVal.done };
-				} else {
-					return { value: null, done: true };
-				}
-			},
-
-			[Symbol.iterator](): IterableIterator<V> {
-				return this;
-			},
-		};
+	values(): MapIterator<V> {
+		let iterator = new HashMapIterator<V, K, V>(
+			this.valArr.values(),
+			(node) => {
+				return node.val;
+			}
+		);
+		return iterator;
 	}
 
-	[Symbol.iterator](): IterableIterator<[K, V]> {
+	[Symbol.iterator](): MapIterator<[K, V]> {
 		return this.entries();
 	}
 
