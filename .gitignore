@@ -6,9 +6,8 @@ logs
 node_modules/
 
 # Yarn Integrity file
-yarn.lock
+pnpm-lock.yaml
+package-lock.json
 
 # TypeScript cache
 tsconfig.tsbuildinfo
-
-.DS_Store
